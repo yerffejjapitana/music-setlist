@@ -1,0 +1,37 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: "Inter", sans-serif;
+  margin: 0;
+}
+h2 {
+  color: #167f78;
+  font-size: 30px;
+}
+h3 {
+  color: #009ee7;
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+h2:first-child {
+  margin-top: 0;
+}
+span {
+  display: block;
+  font-weight: 700;
+  font-size: 20px;
+}
+#page-wrapper {
+  padding: 25px;
+}
+.song__structure {
+  font-size: 18px;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+.song__chords {
+  color: #ff0000;
+  font-size: 30px;
+}
