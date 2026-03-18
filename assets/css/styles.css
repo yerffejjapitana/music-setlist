@@ -26,12 +26,13 @@ span {
   padding: 25px;
 }
 .song__structure {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 24px;
+  font-weight: 600;
   text-transform: uppercase;
-  margin-top: 5px;
+  margin-top: 15px;
+  color: #ff0000;
 }
 .song__chords {
-  color: #ff0000;
+  color: #000000;
   font-size: 30px;
 }
