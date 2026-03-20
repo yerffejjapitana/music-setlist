@@ -11,7 +11,7 @@ h2 {
 }
 h3 {
   color: #009ee7;
-  font-size: 26px;
+  font-size: 22px;
   margin-bottom: 10px;
 }
 h2:first-child {
@@ -26,7 +26,7 @@ span {
   padding: 25px;
 }
 .song__structure {
-  font-size: 24px;
+  font-size: 20x;
   font-weight: 600;
   text-transform: uppercase;
   margin-top: 15px;
@@ -34,5 +34,15 @@ span {
 }
 .song__chords {
   color: #000000;
-  font-size: 30px;
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+.repeat {
+  color: #000000;
+  display: inline-block;
+  font-size: 16px;
+}
+.repeat-times {
+  color: #ff0000;
+  display: inline-block;
 }
