@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music Setlist</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="topbar">
+    <button id="menu-toggle" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <span id="topbar-title">Setlist 1</span>
+  </div>
+
+  <div id="sidebar-overlay"></div>
+
+  <aside id="sidebar">
+    <h2>Setlists</h2>
+    <nav id="setlist-nav"></nav>
+  </aside>
+
+  <main id="main-content"></main>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script src="data.js"></script>
+  <script src="transpose.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
