@@ -177,9 +177,8 @@ body {
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 14px 18px;
-  cursor: grab;
+  cursor: default;
   transition: border-color 0.15s, box-shadow 0.15s;
-  touch-action: none; /* required for SortableJS touch drag */
 }
 
 .song-card:hover {
