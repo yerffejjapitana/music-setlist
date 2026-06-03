@@ -157,6 +157,8 @@ function renderMain() {
       animation: 150,
       handle: ".song-card",
       ghostClass: "sortable-ghost",
+      delay: 200,
+      delayOnTouchOnly: true,
       onEnd(evt) {
         const sl = SETLISTS.find(s => s.id === evt.to.dataset.setlistId);
         const grp = sl.groups.find(g => g.name === evt.to.dataset.group);
