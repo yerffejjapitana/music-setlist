@@ -1,5 +1,4 @@
 let activeSetlistId = SETLISTS[0].id;
-// transposeState[setlistId][songId] = semitone offset
 const transposeState = {};
 
 function getSongById(id) {
@@ -38,14 +37,13 @@ function renderSidebar() {
 
 // --- Song Card ---
 
-function renderSongCard(song, setlistId, groupName) {
+function renderSongCard(song, setlistId) {
   const semitones = getTranspose(setlistId, song.id);
   const transposedKey = transposeChordString(song.key, semitones);
 
   const card = document.createElement("div");
   card.className = "song-card";
   card.dataset.songId = song.id;
-  card.dataset.group = groupName;
 
   const header = document.createElement("div");
   header.className = "song-header";
@@ -71,7 +69,7 @@ function renderSongCard(song, setlistId, groupName) {
   btnDown.title = "Transpose down";
   btnDown.addEventListener("click", () => {
     setTranspose(setlistId, song.id, semitones - 1);
-    refreshSongCard(card, song, setlistId, groupName);
+    card.replaceWith(renderSongCard(song, setlistId));
   });
 
   const btnReset = document.createElement("button");
@@ -80,7 +78,7 @@ function renderSongCard(song, setlistId, groupName) {
   btnReset.title = "Reset transpose";
   btnReset.addEventListener("click", () => {
     setTranspose(setlistId, song.id, 0);
-    refreshSongCard(card, song, setlistId, groupName);
+    card.replaceWith(renderSongCard(song, setlistId));
   });
 
   const btnUp = document.createElement("button");
@@ -89,7 +87,7 @@ function renderSongCard(song, setlistId, groupName) {
   btnUp.title = "Transpose up";
   btnUp.addEventListener("click", () => {
     setTranspose(setlistId, song.id, semitones + 1);
-    refreshSongCard(card, song, setlistId, groupName);
+    card.replaceWith(renderSongCard(song, setlistId));
   });
 
   controls.append(keyBadge, btnDown, semLabel, btnUp, btnReset);
@@ -108,12 +106,6 @@ function renderSongCard(song, setlistId, groupName) {
   return card;
 }
 
-function refreshSongCard(card, song, setlistId, groupName) {
-  const newCard = renderSongCard(song, setlistId, groupName);
-  // Preserve sortable handle
-  card.replaceWith(newCard);
-}
-
 // --- Main Content ---
 
 function renderMain() {
@@ -123,10 +115,21 @@ function renderMain() {
   const setlist = SETLISTS.find(sl => sl.id === activeSetlistId);
   if (!setlist) return;
 
+  const headingRow = document.createElement("div");
+  headingRow.className = "setlist-heading-row";
+
   const heading = document.createElement("h1");
   heading.className = "setlist-heading";
   heading.textContent = setlist.name;
-  main.appendChild(heading);
+
+  const settingsBtn = document.createElement("button");
+  settingsBtn.className = "settings-btn";
+  settingsBtn.innerHTML = "&#9881; Order Songs";
+  settingsBtn.title = "Reorder songs";
+  settingsBtn.addEventListener("click", () => openSettings(setlist));
+
+  headingRow.append(heading, settingsBtn);
+  main.appendChild(headingRow);
 
   setlist.groups.forEach(group => {
     const section = document.createElement("section");
@@ -139,35 +142,83 @@ function renderMain() {
 
     const list = document.createElement("div");
     list.className = "song-list";
-    list.dataset.setlistId = setlist.id;
-    list.dataset.group = group.name;
 
     group.songIds.forEach(id => {
       const song = getSongById(id);
       if (!song) return;
-      const card = renderSongCard(song, setlist.id, group.name);
-      list.appendChild(card);
+      list.appendChild(renderSongCard(song, setlist.id));
     });
 
     section.appendChild(list);
     main.appendChild(section);
+  });
+}
 
-    // Init SortableJS on this list
-    Sortable.create(list, {
-      animation: 150,
-      handle: ".song-card",
-      ghostClass: "sortable-ghost",
-      delay: 200,
-      delayOnTouchOnly: true,
-      onEnd(evt) {
-        const sl = SETLISTS.find(s => s.id === evt.to.dataset.setlistId);
-        const grp = sl.groups.find(g => g.name === evt.to.dataset.group);
-        // Reorder songIds to match new DOM order
-        const newOrder = [...evt.to.querySelectorAll(".song-card")].map(el => el.dataset.songId);
-        grp.songIds = newOrder;
-      }
+// --- Settings Modal ---
+
+function openSettings(setlist) {
+  const modal = document.getElementById("settings-modal");
+  const overlay = document.getElementById("settings-overlay");
+  const body = document.getElementById("settings-body");
+  const title = document.getElementById("settings-title");
+
+  title.textContent = `${setlist.name} — Song Order`;
+  body.innerHTML = "";
+
+  setlist.groups.forEach(group => {
+    const groupLabel = document.createElement("h3");
+    groupLabel.className = "settings-group-label";
+    groupLabel.textContent = group.name;
+    body.appendChild(groupLabel);
+
+    group.songIds.forEach((songId, idx) => {
+      const song = getSongById(songId);
+      if (!song) return;
+
+      const row = document.createElement("div");
+      row.className = "settings-row";
+
+      const label = document.createElement("span");
+      label.className = "settings-song-name";
+      label.textContent = `${idx + 1}. ${song.title}`;
+
+      const btnGroup = document.createElement("div");
+      btnGroup.className = "settings-btn-group";
+
+      const btnUp = document.createElement("button");
+      btnUp.className = "order-btn";
+      btnUp.textContent = "↑";
+      btnUp.disabled = idx === 0;
+      btnUp.addEventListener("click", () => {
+        group.songIds.splice(idx, 1);
+        group.songIds.splice(idx - 1, 0, songId);
+        openSettings(setlist);
+      });
+
+      const btnDown = document.createElement("button");
+      btnDown.className = "order-btn";
+      btnDown.textContent = "↓";
+      btnDown.disabled = idx === group.songIds.length - 1;
+      btnDown.addEventListener("click", () => {
+        group.songIds.splice(idx, 1);
+        group.songIds.splice(idx + 1, 0, songId);
+        openSettings(setlist);
+      });
+
+      btnGroup.append(btnUp, btnDown);
+      row.append(label, btnGroup);
+      body.appendChild(row);
     });
   });
+
+  modal.classList.remove("hidden");
+  overlay.classList.remove("hidden");
+}
+
+function closeSettings() {
+  document.getElementById("settings-modal").classList.add("hidden");
+  document.getElementById("settings-overlay").classList.add("hidden");
+  renderMain();
 }
 
 // --- Mobile sidebar drawer ---
@@ -177,21 +228,16 @@ function initMobileMenu() {
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("sidebar-overlay");
 
-  function openMenu() {
-    sidebar.classList.add("open");
-    overlay.classList.add("open");
-  }
-
-  function closeMenu() {
-    sidebar.classList.remove("open");
-    overlay.classList.remove("open");
-  }
-
   toggle.addEventListener("click", () => {
-    sidebar.classList.contains("open") ? closeMenu() : openMenu();
+    sidebar.classList.contains("open")
+      ? sidebar.classList.remove("open") || overlay.classList.remove("open")
+      : sidebar.classList.add("open") || overlay.classList.add("open");
   });
 
-  overlay.addEventListener("click", closeMenu);
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("open");
+  });
 }
 
 function updateTopbarTitle(name) {
@@ -203,6 +249,10 @@ function updateTopbarTitle(name) {
 
 document.addEventListener("DOMContentLoaded", () => {
   initMobileMenu();
+
+  document.getElementById("settings-close").addEventListener("click", closeSettings);
+  document.getElementById("settings-overlay").addEventListener("click", closeSettings);
+
   renderSidebar();
   renderMain();
 });

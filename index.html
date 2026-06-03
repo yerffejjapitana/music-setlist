@@ -23,7 +23,16 @@
 
   <main id="main-content"></main>
 
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <!-- Settings Modal -->
+  <div id="settings-overlay" class="modal-overlay hidden"></div>
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-header">
+      <h2 id="settings-title">Settings</h2>
+      <button id="settings-close" aria-label="Close">✕</button>
+    </div>
+    <div id="settings-body"></div>
+  </div>
+
   <script src="data.js"></script>
   <script src="transpose.js"></script>
   <script src="app.js"></script>
